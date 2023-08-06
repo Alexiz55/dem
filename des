@@ -1,0 +1,94 @@
+namespace DEMO
+{
+    public partial class Form1 : Form
+    {
+        papelería[] DP = new papelería[8];
+        int i = 0;
+        struct papelería
+        {
+            public int día;
+            public int modelo;
+            public int cantidad;
+            public int precio;
+        }
+        public Form1()
+        {
+            InitializeComponent();
+        }
+        private void agregar_Click(object sender, EventArgs e)
+        {
+            if (i >= DP.Length)
+            {
+                MessageBox.Show("Rebasó el límite de agregar");
+            }
+            else
+            {
+                DP[i].día = Convert.ToInt16(días_txt.Text);
+                DP[i].modelo = Convert.ToInt16(modelo_box.Text);
+                DP[i].cantidad = Convert.ToInt16(cantidad_txt.Text);
+                int[] precios = { 5, 10, 15, 20, 25, 30, 35, 40 };
+                DP[i].precio = precios[DP[i].modelo - 1];
+                i++;
+                días_txt.Clear();
+                modelo_box.SelectedIndex = 0;
+                cantidad_txt.Clear();
+            }
+        }
+        private void calcular_Click(object sender, EventArgs e)
+        {
+            int[] totalPorModelo = new int[8];
+            for (int j = 0; j < i; j++)
+            {
+                int modeloActual = DP[j].modelo;
+                int cantidadActual = DP[j].cantidad;
+                int precioModelo = DP[j].precio;
+                totalPorModelo[modeloActual - 1] += cantidadActual * precioModelo;
+            }
+
+            TotalModelo31.Items.Clear();
+            for (int j = 0; j < totalPorModelo.Length; j++)
+            {
+                TotalModelo31.Items.Add($"Modelo {j + 1}: {totalPorModelo[j]}");
+            }
+
+            int[] totalPorDia = new int[31];
+            for (int j = 0; j < i; j++)
+            {
+                int diaActual = DP[j].día;
+                int modeloActual = DP[j].modelo;
+                int cantidadActual = DP[j].cantidad;
+                int precioModelo = DP[j].precio;
+                totalPorDia[diaActual - 1] += cantidadActual * precioModelo;
+            }
+
+            TotalXdía.Items.Clear();
+            for (int j = 0; j < totalPorDia.Length; j++)
+            {
+                TotalXdía.Items.Add($"Día {j + 1}: {totalPorDia[j]}");
+            }
+
+            int modeloMasRentable = 1;
+            int maxRecaudado = totalPorModelo[0];
+            for (int j = 1; j < totalPorModelo.Length; j++)
+            {
+                if (totalPorModelo[j] > maxRecaudado)
+                {
+                    maxRecaudado = totalPorModelo[j];
+                    modeloMasRentable = j + 1;
+                }
+            }
+
+            ModeloQueMásProdujo.Items.Clear();
+            ModeloQueMásProdujo.Items.Add($"Modelo {modeloMasRentable}: {maxRecaudado}");
+        }
+
+        private void Imprimir_Click(object sender, EventArgs e)
+        {
+            for (int x = 0; x < i; x++)
+            {
+                Tabla.Rows.Add(DP[x].día, DP[x].modelo, DP[x].cantidad);
+            }
+            i--;
+        }
+    }
+}
